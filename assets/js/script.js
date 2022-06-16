@@ -2,8 +2,7 @@ var events
 var mom = moment().hours()
 var tempArray = []
 var savedData
-
-
+ 
 
  // creates an empty array to hold data before moving to localStorage
  var storageArray = function() {
@@ -17,22 +16,24 @@ var savedData
 }
 storageArray()
 
-
-// loop to form each row of the calendar
-for (i = 9; i < 18; i++) {
-
+// get localStorage data
 var loadData = function() {
-    savedData = JSON.parse(localStorage.getItem("event"));
+    savedData = JSON.parse(localStorage.getItem("event"));   
         }
     loadData()
-    
-   
-    
 
+// if there is no local storage data use the empty tempArray 
+if(!savedData) {
+    savedData = tempArray
+}
+
+// loop to form each row of the calendar
+for (i = 9; i < 18; i++) {   
+ 
 // converts i into an array index
 timeIndex = i - 9
 
-// converts 24 hour time to AM/PM for use as text in the calendar
+// converts 24 hour time to AM/PM for use as text in the scheduler
 if(i > 12) {
     ampm = i - 12 + "PM"      
 } else if(i < 12) {
@@ -41,7 +42,7 @@ if(i > 12) {
     ampm = i + "PM"
 }
 
-//sets background color based on time of day
+// this function is used to set background color based on time of day
 var dayTimer = function(id,El) {
     if (id < mom) {                       
         El.addClass("past")
@@ -56,8 +57,14 @@ var dayTimer = function(id,El) {
 var calendarRowEl = $("<section>").addClass("row")
 var hourCol = $("<div>").addClass("col-1 hour d-flex align-items-center justify-content-center").text(ampm)
 var eventCol = $("<div>").addClass("col-10 textarea d-flex align-items-center").attr("tracker",i)
-var eventText = $("<p>").attr("tracker",i).text(savedData[timeIndex].text)
 var saveCol = $("<div>").addClass("col-1 saveBtn d-flex align-items-center justify-content-center").html("<img src='./assets/images/save-icon-18-256.png' alt='save icon' height='20px' width='20px'>").attr("tracker", i)
+
+// if there is stored text data set text with that value else create an empty text box
+if(savedData[timeIndex].text) {
+    var eventText = $("<p>").attr("tracker",i).text(savedData[timeIndex].text)
+} else {
+    var eventText = $("<p>").attr("tracker",i)
+}
 
 // sets the background color of text area 
 dayTimer(i,eventCol)
@@ -70,6 +77,7 @@ $(calendarRowEl).append(hourCol, eventCol, saveCol)
 
 // append row to container 
 $(".container").append(calendarRowEl)
+
 }
 
 
@@ -78,7 +86,8 @@ $(".container").append(calendarRowEl)
 $(".container").on("click", "div.textarea", function(event){
     var formId = $(this).attr("tracker")
     var text = $(this).text()
-           
+     
+ // brings up text input box 
     var textInput = $("<textarea>").addClass("col-10").val(text).attr("tracker", formId)
     $(this).replaceWith(textInput);
     
@@ -133,21 +142,3 @@ $(this).replaceWith(eventDiv);
     localStorage.setItem("event", JSON.stringify(tempArray));
     }
 })
-    
-    
-   
-    
-
-
-  
-                     
-    
-    
-
-       
-
-
-    
-
-
-
